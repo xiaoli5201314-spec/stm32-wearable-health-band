@@ -1,0 +1,32 @@
+name: Host Build and Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  host:
+    name: Ubuntu Host Verification
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - name: Check Out Repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Show Compiler Version
+        run: gcc --version
+
+      - name: Build Host Demo
+        run: make -C firmware -B all
+
+      - name: Run Host Tests
+        run: make -C firmware -B test
+
+      - name: Check STM32 Platform Syntax
+        run: make -C firmware target-syntax
