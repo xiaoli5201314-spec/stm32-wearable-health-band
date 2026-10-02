@@ -70,22 +70,31 @@ make -C firmware target-syntax
 
 ## 待补充的核验
 
-下面是复现命令，不是已通过结果。执行后应补记日期、环境、退出码与实际输出，不仅修改状态标签。
+下表区分已经核对的远端构建和仍待补录的项目；远端记录见下节。
+后续执行其他命令时，应补记日期、环境、退出码与实际输出，不仅修改状态标签。
 
 | 项目 | 命令 | 当前记录状态 |
 | --- | --- | --- |
-| 主机演示构建 | `make -C firmware all` | 待补录 |
+| 主机演示构建 | `make -C firmware -B all` | 2026-10-03 远端 CI 构建通过 |
 | 控制台演示 | `./firmware/build/band_demo 9` | 待补录；传感器仍是合成数据 |
-| GitHub Actions | [.github/workflows/ci.yml](../.github/workflows/ci.yml) | 已配置，未在本次远程运行 |
+| GitHub Actions | [.github/workflows/ci.yml](../.github/workflows/ci.yml) | 2026-10-03 已核对远端成功，见下节 |
 | ASan / UBSan | 需单独构建与运行并记录命令 | 未在本条记录核验 |
 | ARM 固件链接与烧录 | 需补齐目标工程及工具链 | 未核验 |
 | 真实硬件测量 | 需板卡、仪器与可追溯记录 | 未核验 |
 
 联调脚本和手动双终端复现命令见 [BUILD_AND_TEST.md](BUILD_AND_TEST.md)。上述已通过项目与本表待补充项目独立记录，不将本地测试结果扩大为整机或生产环境验收。
 
-## 硬件与健康边界
+## 发布前复验
 
 发布前于 **2026-10-03** 再次执行 `make -C firmware -B test`、`make -C firmware live-test` 和 `make -C firmware target-syntax`，三条命令均以退出码 0 完成。单元测试仍为 **180 个用例、1019 条断言、0 失败**；本地 TCP 补传场景仍为 **8 / 8 条补传、0 条待补传、0 重复 / 乱序 / CRC 错误**；四个目标平台文件的主机语法检查通过。
+
+## 远端自动测试
+
+2026-10-03 核对发布提交 `93740ab` 的 [GitHub Actions 记录](https://github.com/xiaoli5201314-spec/stm32-wearable-health-band/actions/runs/37053451067)，状态为 `completed / success`。
+工作流在 Ubuntu 22.04 构建主机演示、运行单元测试并检查 STM32 平台文件语法。
+`live-test` 仍为单独记录的本地 TCP 联调；后续提交的实时状态以首页徽章和对应 Actions 记录为准。
+
+## 硬件与健康边界
 
 - 未见可核对的原理图、PCB 项目、目标烧录记录或整机验收记录；本文件不认定自制板已完成。
 - 主机模拟 I2C / ADC / GPIO 不证明真实电气时序、传感器误差、射频稳定性或长期运行可靠性。
